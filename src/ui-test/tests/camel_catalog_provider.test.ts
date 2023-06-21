@@ -16,12 +16,12 @@
  */
 
 import { assert, expect } from 'chai';
-import { SettingsEditor, Workbench, VSBrowser, TextSetting, DefaultWait, InputBox, WebDriver, EditorView, By, Marketplace, BottomBarPanel, TerminalView, ComboSetting, ActivityBar, SideBarView, TextEditor } from 'vscode-uitests-tooling';
+import { SettingsEditor, Workbench, VSBrowser, TextSetting, DefaultWait, InputBox, WebDriver, EditorView, By, Marketplace, BottomBarPanel, TerminalView, ComboSetting, ActivityBar, SideBarView, TextEditor, ContentAssist } from 'vscode-uitests-tooling';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as utils from '../utils/testUtils';
 import * as pjson from '../../../package.json';
-import { privateDecrypt } from 'crypto';
+import * as ca from '../utils/contentAssist';
 
 describe('Camel runtime provider user preference set test', function () {
     this.timeout(9999960000);
@@ -32,10 +32,13 @@ describe('Camel runtime provider user preference set test', function () {
     let terminalView: TerminalView;
     let sideBar: SideBarView;
 
-	let editor: TextEditor;
+    let editor: TextEditor;
+    let contentAssist: ContentAssist;
 
     const RESOURCES: string = path.resolve('src', 'ui-test', 'resources');
     const CAMEL_CONTEXT_XML = 'camel-context.xml';
+
+    const URI_POSITION = 33;
 
     const KNATIVE = 'knative';
     const MONGO = 'mongo';
@@ -45,77 +48,142 @@ describe('Camel runtime provider user preference set test', function () {
     const MONGO_PROP = 'mongodb:connectionBean';
     const JMX_PROP = 'jmx:serverURL';
 
-    const PROVIDERS_LIST = [
-		// runtime provider, knative available, mongo available, jmx available
-		['SPRINGBOOT', true, true, true],
-		['QUARKUS', true, true, false],
-		['KARAF', false, true, true]
-	];
-
     before(async function () {
-		this.timeout(200000);
-		driver = VSBrowser.instance.driver;
+        this.timeout(200000);
+        driver = VSBrowser.instance.driver;
 
-		const marketplace = await Marketplace.open();
-		await driver.wait(async function () {
-			return await extensionIsActivated(marketplace);
-		}, 150000, `The LSP extension was not activated after ${this.timeout} sec.`);
-	});
+        await VSBrowser.instance.openResources(RESOURCES);
+        await VSBrowser.instance.waitForWorkbench();
 
+        const marketplace = await Marketplace.open();
+        await driver.wait(async function () {
+            return await extensionIsActivated(marketplace);
+        }, 150000, `The LSP extension was not activated after ${this.timeout} sec.`);
+    });
+
+    
+
+    const PROVIDERS_LIST = [
+        // runtime provider, knative available, mongo available, jmx available
+       // ['SPRINGBOOT', true, true, true],
+        ['QUARKUS', true, true, false],
+     //   ['KARAF', false, true, true]
+    ];
 
     PROVIDERS_LIST.forEach(function (provider) {
         const PROVIDER = provider.at(0).toString();
-		const KNATIVE_AV = provider.at(1);
-		const MONGO_AV = provider.at(2);
-		const JMX_AV = provider.at(3);
+        const KNATIVE_AV = provider.at(1);
+        const MONGO_AV = provider.at(2);
+        const JMX_AV = provider.at(3);
 
         before(async function () {
             setRuntimeProvider(PROVIDER);
-            // open camel-context.xml here
         });
-
+  
         describe(`${PROVIDER} test`, function () {
 
-            it('Knative component', async function () {
-                // insert component
+            beforeEach(async function () {
+                await VSBrowser.instance.openResources(path.join(RESOURCES, CAMEL_CONTEXT_XML));
+            });
 
-                // open ca 
-
-                // check knative_av
-                    // if true, check if available right proposal
-
-                // assert
-                assert(true);
+            afterEach(async function () {
+				await utils.closeEditor(CAMEL_CONTEXT_XML, false);
 			});
 
-            // it('Mongo component', async function () {
-			//	// same here
-			// });
+            it('Knative component', async function () {
 
-            // it('JMX', async function () {
-			//	// same here
-			// });
-        });        
+                // otevřu editor
+                const editor = new TextEditor();
+                await editor.isDisplayed();
+                await editor.typeTextAt(3, URI_POSITION, KNATIVE);
+
+                contentAssist = await editor.toggleContentAssist(true) as ContentAssist;
+                const items = await contentAssist.getItems();
+
+                if (KNATIVE_AV){
+                    assert.equal(items.length, 1);
+                    const timer = await contentAssist.getItem(KNATIVE_PROP);
+                    assert.equal(await utils.getTextExt(timer), KNATIVE_PROP);
+                } else {
+                    assert.equal(items.length, 0);
+                } 
+            });
+
+
+            it('Mongo component', async function () {
+
+                // otevřu editor
+                const editor = new TextEditor();
+                await editor.isDisplayed();
+                await editor.typeTextAt(3, URI_POSITION, MONGO);
+
+                contentAssist = await editor.toggleContentAssist(true) as ContentAssist;
+                const items = await contentAssist.getItems();
+
+              //  await DefaultWait.sleep(100000);
+
+                if (MONGO_AV){
+                    assert.equal(items.length, 2); // mozna spis contains???
+                    const timer = await contentAssist.getItem(MONGO_PROP);
+                    assert.equal(await utils.getTextExt(timer), MONGO_PROP);
+                } else {
+                    assert.equal(items.length, 0);
+                } 
+            });
+
+
+            it('JMX component', async function () {
+
+                // otevřu editor
+                const editor = new TextEditor();
+                await editor.isDisplayed();
+                await editor.typeTextAt(3, URI_POSITION, JMX);
+
+                contentAssist = await editor.toggleContentAssist(true) as ContentAssist;
+                const items = await contentAssist.getItems();
+
+                await DefaultWait.sleep(100000000);
+                
+
+                if (JMX_AV){
+                    assert.equal(items.length, 1);
+                    const timer = await contentAssist.getItem(JMX_PROP);
+                    assert.equal(await utils.getTextExt(timer), JMX_PROP);
+                } else {
+                    assert.equal(items.length, 0);
+                } 
+            });
+
+
+
+        });
     });
 
     async function setRuntimeProvider(provider: string): Promise<void> {
         settings = await new Workbench().openSettings();
+
         const textField = await settings.findSetting('Camel catalog runtime provider', 'Camel') as ComboSetting;
+
+        console.log('tadyyyy');
+        console.log(await textField.getValues());
+
         await textField.setValue(provider);
+
+        
         utils.closeEditor('Settings', true);
     }
 
     async function extensionIsActivated(marketplace: Marketplace): Promise<boolean> {
-		try {
-			const item = await marketplace.findExtension(`@installed ${pjson.displayName}`);
-			const activationTime = await item.findElement(By.className('activationTime'));
-			if (activationTime !== undefined) {
-				return true;
-			} else {
-				return false;
-			}
-		} catch (err) {
-			return false;
-		}
-	}
+        try {
+            const item = await marketplace.findExtension(`@installed ${pjson.displayName}`);
+            const activationTime = await item.findElement(By.className('activationTime'));
+            if (activationTime !== undefined) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (err) {
+            return false;
+        }
+    }
 });
