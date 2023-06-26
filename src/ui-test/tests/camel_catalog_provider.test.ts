@@ -142,7 +142,7 @@ describe('Camel runtime provider user preference set test', function () {
                 contentAssist = await editor.toggleContentAssist(true) as ContentAssist;
                 const items = await contentAssist.getItems();
 
-                await DefaultWait.sleep(100000000);
+               // await DefaultWait.sleep(100000000);
                 
 
                 if (JMX_AV){
