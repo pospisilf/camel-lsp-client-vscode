@@ -37,7 +37,8 @@ import {
 	until,
 	VSBrowser,
 	ViewControl,
-	WebDriver
+	WebDriver,
+	DefaultWait
 } from 'vscode-uitests-tooling';
 import * as pjson from '../../../package.json';
 
@@ -74,6 +75,7 @@ describe('Language Support for Apache Camel extension', function () {
 		});
 
 		it('Find extension', async function () {
+			await DefaultWait.sleep(1000);
 			await driver.wait(async function () {
 				item = await (await extensionsView.getContent().getSection('Installed') as ExtensionsViewSection).findItem(`@installed ${pjson.displayName}`);
 				return item !== undefined;
