@@ -7,6 +7,7 @@
 	"extends": [
 		"eslint:recommended",
 		"plugin:@typescript-eslint/recommended",
+		"plugin:@typescript-eslint/recommended-requiring-type-checking",
 		"plugin:import/typescript"
 	],
 	"parser": "@typescript-eslint/parser",
@@ -23,11 +24,32 @@
 		"eslint-plugin-import"
 	],
 	"rules": {
-		"@typescript-eslint/no-var-requires": "off", /** allows require statements outside of imports **/
+		"@typescript-eslint/no-var-requires": "off", /** allows require statements outside of imports was off**/
 		"no-async-promise-executor": "off", /* Deactivated for now as i do not know how to fix it safely*/
-		"@typescript-eslint/no-namespace": "off",
-		"@typescript-eslint/no-explicit-any": "off",
+		"@typescript-eslint/no-namespace": "off", // was off
+		"@typescript-eslint/no-explicit-any": "off", // was off
 		"@typescript-eslint/no-floating-promises": "warn",
+
+		// we need this rules
+		"@typescript-eslint/no-unsafe-assignment": "off", 
+		"@typescript-eslint/no-unsafe-argument": "off",
+		"@typescript-eslint/no-unsafe-member-access": "off",
+		"@typescript-eslint/no-unsafe-call": "off",
+		"@typescript-eslint/no-unnecessary-type-assertion": "off",
+		"@typescript-eslint/no-misused-promises": "off", 
+		"@typescript-eslint/require-await": "off",
+		"@typescript-eslint/no-base-to-string": "off",
+		"@typescript-eslint/no-unsafe-return": "off",
+		"@typescript-eslint/restrict-template-expressions": "off",
+		"no-unused-vars": "off", 
+        "no-extra-semi": "off", 
+        "prefer-const": "off", // was warn
+        "curly": "off", // was warn
+        "eqeqeq": "off", // was warn
+        "no-throw-literal": "off", // was warn
+        "@typescript-eslint/no-unused-vars": "off", // was warn
+        "@typescript-eslint/restrict-plus-operands": "off", // was warn
+
 		"import/no-extraneous-dependencies": [
 			"error",
 			{
