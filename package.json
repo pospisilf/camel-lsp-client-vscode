@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "vscode-apache-camel",
   "displayName": "Language Support for Apache Camel by Red Hat",
   "description": "Provides completion, validation and documentation features for Apache Camel URI elements.",
