@@ -338,7 +338,7 @@
     "watch": "tsc -watch -p ./",
     "postinstall": "node ./scripts/postinstall.js",
     "test": "node ./out/src/test/runTest.js",
-    "lint": "eslint src --ext .ts",
+    "lint": "eslint src",
     "preui-test": "npm run compile",
     "ui-test": "node ./out/src/ui-test/uitest_runner.js",
     "ui-coverage": "npm run ui-test -- coverage"
