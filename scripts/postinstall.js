@@ -2,9 +2,9 @@
 
 const LSP_SERVER_VERSION = "1.26.0-SNAPSHOT";
 
-const download = require("mvn-artifact-download").default;
-const fs = require('fs');
-const path = require('path');
+import download from "mvn-artifact-download";
+import * as fs from 'fs';
+import * as path from 'path';
 
 const MAVEN_REPO_URL = 'https://oss.sonatype.org/content/repositories/snapshots/';
 
