@@ -2,7 +2,8 @@
 
 const LSP_SERVER_VERSION = "1.26.0-SNAPSHOT";
 
-import { download } from "mvn-artifact-download"; // Named export
+import pkg from "mvn-artifact-download"; // Default import
+const { default: download } = pkg; // Destructure the download function
 import * as fs from 'fs';
 import * as path from 'path';
 
