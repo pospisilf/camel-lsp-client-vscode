@@ -3,6 +3,8 @@ name: Camel Version CI
 on:
   pull_request:
     branches: [ main ]
+  push:
+    branches: [ main, jbang490 ]
   workflow_dispatch:
 
 concurrency:
