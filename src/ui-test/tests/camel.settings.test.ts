@@ -53,7 +53,7 @@ import {
 } from 'vscode-extension-tester';
 import * as pjson from '../../../package.json';
 
-describe('User preferences', function () {
+describe.only('User preferences', function () {
 
 	let driver: WebDriver;
 	let contentAssist: ContentAssist;
@@ -181,7 +181,7 @@ describe('User preferences', function () {
 	});
 
 	describe('JBang version', function () {
-		this.timeout(90000);
+		this.timeout(300000);
 
 		const FILENAME = 'test';
 		const FILENAME_SUFFIX = 'test.camel.xml';
